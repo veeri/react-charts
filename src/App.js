@@ -1,23 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import LinePlot from "./Charts/Line";
+import Barchart from "./Charts/BarChart";
+import PieChart from "./Charts/PieChart";
+import * as d3 from "d3";
 
 function App() {
+  const [data, setData] = useState(() => d3.ticks(-2, 2, 200).map(Math.sin));
+
+  console.log("data", data);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {/* <LinePlot data={data} /> */}
+      {/* <Barchart /> */}
+      <PieChart />
     </div>
   );
 }
