@@ -45,3 +45,18 @@
 
 ***interpolator(d3.interpolateCool)*** This sets the color interpolation function that defines the range of colors the scale will output.
 interpolateCool is one of the built-in interpolator functions in D3 that produces a color gradient ranging from light blue to purple. It provides a visually appealing set of colors that transition smoothly.
+
+
+## <ins>Area Charts</ins>
+
+![alt text](image-4.png)
+
+***area*** function is used to create an area generator.The area generator produces an SVG path string from data points, which can be used to create an area chart.
+
+
+`<path fill="steelblue" d="M41.056,233.333L115.704,38.889L190.352,175L265,116.667L339.648,272.222L414.296,0L488.944,136.111L488.944,350L414.296,350L339.648,350L265,350L190.352,350L115.704,350L41.056,350Z"></path>`
+
+The d3.area() function generates the d attribute of the <path> element, which defines the shape of the area.
+
+
+***datum*** function is used to bind a single data point (or a single data object) to a selected DOM element. This is different from the data() function, which binds an array of data to a selection of multiple elements.

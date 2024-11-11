@@ -5,6 +5,7 @@ import LinePlot from "./Charts/Line";
 import Barchart from "./Charts/BarChart";
 import PieChart from "./Charts/PieChart";
 import BubbleChart from "./Charts/BubbleChart";
+import AreaChart from "./Charts/AreaChart";
 
 import * as d3 from "d3";
 
@@ -17,7 +18,8 @@ function App() {
       {/* <LinePlot data={data} /> */}
       {/* <Barchart /> */}
       {/* <PieChart /> */}
-      <BubbleChart />
+      {/* <BubbleChart /> */}
+      <AreaChart />
     </div>
   );
 }
