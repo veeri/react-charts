@@ -4,6 +4,8 @@ import "./App.css";
 import LinePlot from "./Charts/Line";
 import Barchart from "./Charts/BarChart";
 import PieChart from "./Charts/PieChart";
+import BubbleChart from "./Charts/BubbleChart";
+
 import * as d3 from "d3";
 
 function App() {
@@ -14,7 +16,8 @@ function App() {
     <div className="App">
       {/* <LinePlot data={data} /> */}
       {/* <Barchart /> */}
-      <PieChart />
+      {/* <PieChart /> */}
+      <BubbleChart />
     </div>
   );
 }

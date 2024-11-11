@@ -52,7 +52,7 @@ function PieChart(props) {
 
     const pieGenerator = d3
       .pie()
-      .padAngle(0)
+      .padAngle(0.2)
       .value((d) => d.value);
 
     const arc = svg.selectAll().data(pieGenerator(data)).enter();
