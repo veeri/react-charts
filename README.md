@@ -51,6 +51,8 @@ interpolateCool is one of the built-in interpolator functions in D3 that produce
 
 ![alt text](image-4.png)
 
+#### Concepts covered here 
+
 ***area*** function is used to create an area generator.The area generator produces an SVG path string from data points, which can be used to create an area chart.
 
 
