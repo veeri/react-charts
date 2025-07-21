@@ -25,6 +25,8 @@ RUN npm install
 # Copy app source code
 COPY . .
 
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
 # Build optimized production version
 RUN npm run build
 
