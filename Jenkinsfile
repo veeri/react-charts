@@ -6,12 +6,14 @@ environment {
     ECR_REPO = '455905339171.dkr.ecr.eu-north-1.amazonaws.com/my-react-app'
     IMAGE_TAG = "latest"
     DOCKER_IMAGE = "${ECR_REPO}:${IMAGE_TAG}"
+    GIT_CREDENTIALS_ID = 'f01e9e83-c2e9-4584-b59a-b30b08dcaa47' 
+    // GIT_CREDENTIALS_ID = credentials('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') // this pulls from Jenkins credentials securely
 }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git credentialsId: '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', url: 'https://github.com/veeri/react-charts.git', branch: 'main'
+                git credentialsId: '${GIT_CREDENTIALS_ID}', url: 'https://github.com/veeri/react-charts.git' , branch: 'main'
             }
         }
 
@@ -23,7 +25,7 @@ environment {
                 ]]) {
                     sh '''
                         aws --version
-                        aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 455905339171.dkr.ecr.eu-north-1.amazonaws.com/my-react-app
+                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
                     '''
                 }
             }
