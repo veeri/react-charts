@@ -6,8 +6,7 @@ environment {
     ECR_REPO = '455905339171.dkr.ecr.eu-north-1.amazonaws.com/my-react-app'
     IMAGE_TAG = "latest"
     DOCKER_IMAGE = "${ECR_REPO}:${IMAGE_TAG}"
-    GIT_CREDENTIALS_ID = 'f01e9e83-c2e9-4584-b59a-b30b08dcaa47' 
-    // GIT_CREDENTIALS_ID = credentials('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') // this pulls from Jenkins credentials securely
+    GIT_CREDENTIALS_ID = credentials('github-pat-token')
 }
 
     stages {
