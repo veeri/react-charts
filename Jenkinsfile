@@ -1,50 +1,51 @@
 pipeline {
-    agent any
+  agent any
 
-    tools {
-        nodejs "NodeJS 18"  // Name must match the NodeJS tool in Jenkins
+  environment {
+    // change these to match your repo & branch
+    REPO_URL = 'https://github.com/veeri/react-charts.git'
+    BRANCH = 'main'
+    GIT_CREDENTIALS_ID = 'github-pat'   // the credential ID you added in Jenkins
+    DEPLOY_DIR = '/var/www/react'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        // uses Jenkins built-in 'git' step with credentials
+        git url: env.REPO_URL, branch: env.BRANCH, credentialsId: env.GIT_CREDENTIALS_ID
+      }
     }
 
-    environment {
-        REACT_BUILD_DIR = "/var/www/react-app"  // Deployment directory
+    stage('Install') {
+      steps {
+        sh 'npm ci'
+      }
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/veeri/react-charts'
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                echo "Installing npm dependencies with peer deps..."
-                sh 'npm install --legacy-peer-deps'
-            }
-        }
-
-        stage('Build React App') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh """
-                    sudo rm -rf ${REACT_BUILD_DIR}/*
-                    sudo cp -r build/* ${REACT_BUILD_DIR}/
-                """
-            }
-        }
+    stage('Build') {
+      steps {
+        sh 'npm run build'
+      }
     }
 
-    post {
-        success {
-            echo "React app built and deployed successfully!"
-        }
-        failure {
-            echo "Build failed!"
-        }
+    stage('Deploy') {
+      steps {
+        // ensure deploy dir exists (owned by jenkins user)
+        sh "mkdir -p ${DEPLOY_DIR}"
+        // delete previous content safely, then copy build *contents*
+        sh "rm -rf ${DEPLOY_DIR}/*"
+        sh "cp -r ${WORKSPACE}/build/* ${DEPLOY_DIR}/"
+      }
     }
+  }
+
+  post {
+    success {
+      echo "Build & deploy succeeded. App deployed to ${DEPLOY_DIR}"
+    }
+    failure {
+      echo "Build or deploy failed"
+    }
+  }
 }
