@@ -12,14 +12,13 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/veeri/react-charts'
+                git branch: 'main', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo "Installing npm dependencies with peer deps..."
-                sh 'npm install --legacy-peer-deps'
+                sh 'npm ci'
             }
         }
 
