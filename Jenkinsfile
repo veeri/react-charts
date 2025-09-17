@@ -1,60 +1,50 @@
 pipeline {
     agent any
 
-environment {
-    AWS_REGION = 'eu-north-1'
-    ECR_REPO = '455905339171.dkr.ecr.eu-north-1.amazonaws.com/my-react-app'
-    IMAGE_TAG = "latest"
-    DOCKER_IMAGE = "${ECR_REPO}:${IMAGE_TAG}"
-    GIT_CREDENTIALS_ID = credentials('github-pat-token')
-}
+    tools {
+        nodejs "NodeJS 18"  // Name must match the NodeJS tool in Jenkins
+    }
+
+    environment {
+        REACT_BUILD_DIR = "/var/www/react-app"  // Deployment directory
+    }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git credentialsId: '${GIT_CREDENTIALS_ID}', url: 'https://github.com/veeri/react-charts.git' , branch: 'main'
+                git branch: 'main', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
             }
         }
 
-        stage('Login to AWS ECR') {
+        stage('Install Dependencies') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'jenkins-ecr-user'
-                ]]) {
-                    sh '''
-                        aws --version
-                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
-                    '''
-                }
+                echo "Installing npm dependencies with peer deps..."
+                sh 'npm install --legacy-peer-deps'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build React App') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh 'npm run build'
             }
         }
 
-        stage('Push Docker Image to ECR') {
+        stage('Deploy') {
             steps {
-                sh 'docker push $DOCKER_IMAGE'
+                sh """
+                    sudo rm -rf ${REACT_BUILD_DIR}/*
+                    sudo cp -r build/* ${REACT_BUILD_DIR}/
+                """
             }
         }
+    }
 
-        stage('Deploy to EC2') {
-            steps {
-                sshagent (credentials: ['ec2-ssh-key-id']) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no ec2-user@your-ec2-public-ip << EOF
-                        docker pull $DOCKER_IMAGE
-                        docker stop react-app || true
-                        docker rm react-app || true
-                        docker run -d --name react-app -p 80:80 $DOCKER_IMAGE
-                        EOF
-                    '''
-                }
-            }
+    post {
+        success {
+            echo "React app built and deployed successfully!"
+        }
+        failure {
+            echo "Build failed!"
         }
     }
 }
