@@ -1,50 +1,17 @@
 pipeline {
-    agent any
-
-    tools {
-        nodejs "NodeJS 18"  // Name must match the NodeJS tool in Jenkins
-    }
-
-    environment {
-        REACT_BUILD_DIR = "/var/www/react-app"  // Deployment directory
-    }
-
-    stages {
-        stage('Checkout') {
+     agent any
+     stages {
+        stage("Build") {
             steps {
-                git branch: 'main', url: 'https://github.com/veeri/react-charts'
+                sh "npm install"
+                sh "npm run build"
             }
         }
-
-        stage('Install Dependencies') {
+        stage("Deploy") {
             steps {
-                echo "Installing npm dependencies with peer deps..."
-                sh 'npm install --legacy-peer-deps'
+                sh "sudo rm -rf /var/www/react"
+                sh "sudo cp -r ${WORKSPACE}/build/ /var/www/react/"
             }
-        }
-
-        stage('Build React App') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh """
-                    sudo rm -rf ${REACT_BUILD_DIR}/*
-                    sudo cp -r build/* ${REACT_BUILD_DIR}/
-                """
-            }
-        }
-    }
-
-    post {
-        success {
-            echo "React app built and deployed successfully!"
-        }
-        failure {
-            echo "Build failed!"
         }
     }
 }
