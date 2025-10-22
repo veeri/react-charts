@@ -1,51 +1,52 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    // change these to match your repo & branch
-    REPO_URL = 'https://github.com/veeri/react-charts.git'
-    BRANCH = 'main'
-    GIT_CREDENTIALS_ID = 'github-pat'   // the credential ID you added in Jenkins
-    DEPLOY_DIR = '/var/www/react'
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        // uses Jenkins built-in 'git' step with credentials
-        git url: env.REPO_URL, branch: env.BRANCH, credentialsId: env.GIT_CREDENTIALS_ID
-      }
+    tools {
+        git 'Default'       // match the name set in Global Tool Configuration
+        nodejs 'node18'     // optional: if using NodeJS plugin
     }
 
-    stage('Install') {
-      steps {
-        sh 'npm ci'
-      }
+    environment {
+        REPO_URL = 'https://github.com/veeri/react-charts.git'
+        BRANCH = 'main'
+        GIT_CREDENTIALS_ID = 'github-pat'
+        DEPLOY_DIR = '/var/www/react'
     }
 
-    stage('Build') {
-      steps {
-        sh 'npm run build'
-      }
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: env.REPO_URL, branch: env.BRANCH, credentialsId: env.GIT_CREDENTIALS_ID
+            }
+        }
+
+        stage('Install') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh "sudo mkdir -p ${DEPLOY_DIR}"
+                sh "sudo rm -rf ${DEPLOY_DIR}/*"
+                sh "sudo cp -r ${WORKSPACE}/build/* ${DEPLOY_DIR}/"
+            }
+        }
     }
 
-    stage('Deploy') {
-      steps {
-        // ensure deploy dir exists (owned by jenkins user)
-        sh "mkdir -p ${DEPLOY_DIR}"
-        // delete previous content safely, then copy build *contents*
-        sh "rm -rf ${DEPLOY_DIR}/*"
-        sh "cp -r ${WORKSPACE}/build/* ${DEPLOY_DIR}/"
-      }
+    post {
+        success {
+            echo "✅ Build & deploy succeeded. App deployed to ${DEPLOY_DIR}"
+        }
+        failure {
+            echo "❌ Build or deploy failed"
+        }
     }
-  }
-
-  post {
-    success {
-      echo "Build & deploy succeeded. App deployed to ${DEPLOY_DIR}"
-    }
-    failure {
-      echo "Build or deploy failed"
-    }
-  }
 }
