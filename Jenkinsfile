@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        git 'Default'       // match the name set in Global Tool Configuration
+        git 'git'       // match the name set in Global Tool Configuration
         nodejs 'NodeJS 18'     // optional: if using NodeJS plugin
     }
 
