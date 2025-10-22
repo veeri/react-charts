@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         git 'Default'       // match the name set in Global Tool Configuration
-        nodejs 'node18'     // optional: if using NodeJS plugin
+        nodejs 'NodeJS 18'     // optional: if using NodeJS plugin
     }
 
     environment {
