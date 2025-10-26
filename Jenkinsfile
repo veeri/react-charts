@@ -14,26 +14,37 @@ pipeline {
     }
 
     stages {
+
+        stage('Prepare Workspace') {
+            steps {
+                echo "🧹 Cleaning workspace..."
+                deleteDir()  // Removes previous build files
+            }
+        }
+
         stage('Checkout') {
             steps {
                 git url: env.REPO_URL, branch: env.BRANCH, credentialsId: env.GIT_CREDENTIALS_ID
             }
         }
 
-        stage('Install') {
+        stage('Dependencies') {
             steps {
+                echo "📦 Installing dependencies with npm ci..."
                 sh 'npm ci'
             }
         }
 
         stage('Build') {
             steps {
+                echo "⚙️ Running build..."
                 sh 'npm run build'
             }
         }
 
         stage('Deploy') {
             steps {
+                echo "🚀 Deploying to server..."
                 sh "sudo mkdir -p ${DEPLOY_DIR}"
                 sh "sudo rm -rf ${DEPLOY_DIR}/*"
                 sh "sudo cp -r ${WORKSPACE}/build/* ${DEPLOY_DIR}/"
@@ -46,7 +57,7 @@ pipeline {
             echo "✅ Build & deploy succeeded. App deployed to ${DEPLOY_DIR}"
         }
         failure {
-            echo "❌ Build or deploy failed"
+            echo "❌ Build or deploy failed. Check npm ci logs above."
         }
     }
 }
